@@ -20,8 +20,8 @@ import ollama.models.*
 import ollama.utils.isSuccessful
 
 class Ollama(
-    val host: String = "localhost",
-    val port: Int = 11434,
+    private val host: String = "localhost",
+    private val port: Int = 11434,
 ) {
     private val _currentState = MutableStateFlow<OllamaState>(OllamaState.IDLE)
     val currentState: StateFlow<OllamaState> = _currentState.asStateFlow()

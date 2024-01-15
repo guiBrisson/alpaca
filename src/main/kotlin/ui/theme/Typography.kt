@@ -30,11 +30,48 @@ val interFontFamily = FontFamily(
     ),
 )
 
+//TODO: Finish typography styles
 val typography = Typography(
     defaultFontFamily = interFontFamily,
     button = TextStyle(
         fontSize = 14.sp,
         letterSpacing = 0.sp,
         fontWeight = FontWeight.Medium,
-    )
+    ),
+    h1 = TextStyle(
+        letterSpacing = 0.sp,
+    ),
+    h2 = TextStyle(
+        letterSpacing = 0.sp,
+    ),
+    h3 = TextStyle(
+        letterSpacing = 0.sp,
+    ),
+    h4 = TextStyle(
+        letterSpacing = 0.sp,
+    ),
+    h5 = TextStyle(
+        letterSpacing = 0.sp,
+    ),
+    h6 = TextStyle(
+        letterSpacing = 0.sp,
+    ),
+    subtitle1 = TextStyle(
+        letterSpacing = 0.sp,
+    ),
+    subtitle2 = TextStyle(
+        letterSpacing = 0.sp,
+    ),
+    body1 = TextStyle(
+        letterSpacing = 0.sp,
+    ),
+    body2 = TextStyle(
+        letterSpacing = 0.sp,
+    ),
+    caption = TextStyle(
+        letterSpacing = 0.sp,
+    ),
+    overline = TextStyle(
+        letterSpacing = 0.sp,
+    ),
 )
