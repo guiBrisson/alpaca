@@ -2,6 +2,7 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -15,9 +16,8 @@ import kotlinx.coroutines.launch
 import ollama.Ollama
 import ollama.exceptions.OllamaModelNotFoundException
 import ollama.models.Model
+import ui.components.ModelSelector
 import ui.theme.AlpacaTheme
-import utils.setupMac
-import utils.setupWindows
 
 @Composable
 @Preview
@@ -28,7 +28,12 @@ fun App() {
     val scope = rememberCoroutineScope()
 
     AlpacaTheme {
-        Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
+        Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background).padding(8.dp)) {
+            ModelSelector(
+                models = models,
+                selectedModel = { },
+            )
+
             Button(onClick = {
                 scope.launch {
                     ollama.generate(
@@ -74,9 +79,6 @@ fun main() = application {
     val state = rememberWindowState(width = 832.dp, height = 960.dp)
 
     Window(onCloseRequest = ::exitApplication, state = state) {
-        setupMac()
-        setupWindows()
-
         App()
     }
 }
