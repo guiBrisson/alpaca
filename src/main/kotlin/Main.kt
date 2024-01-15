@@ -7,13 +7,17 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.launch
 import ollama.Ollama
 import ollama.exceptions.OllamaModelNotFoundException
 import ollama.models.Model
 import ui.theme.AlpacaTheme
+import utils.setupMac
+import utils.setupWindows
 
 @Composable
 @Preview
@@ -67,7 +71,12 @@ fun App() {
 }
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
+    val state = rememberWindowState(width = 832.dp, height = 960.dp)
+
+    Window(onCloseRequest = ::exitApplication, state = state) {
+        setupMac()
+        setupWindows()
+
         App()
     }
 }
