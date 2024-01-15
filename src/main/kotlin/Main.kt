@@ -1,82 +1,59 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import kotlinx.coroutines.launch
-import ollama.Ollama
-import ollama.exceptions.OllamaModelNotFoundException
-import ollama.models.Model
-import ui.components.ModelSelector
+import ollama.presentation.chat.ChatScreen
+import ollama.presentation.chat_history.ChatHistoryScreen
 import ui.theme.AlpacaTheme
 
 @Composable
-@Preview
 fun App() {
-    val ollama = Ollama()
-    var text by remember { mutableStateOf("") }
-    val models = remember { mutableListOf<Model>() }
-    val scope = rememberCoroutineScope()
+    var historyChatExpanded by remember { mutableStateOf(true) }
 
     AlpacaTheme {
-        Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background).padding(8.dp)) {
-            ModelSelector(
-                models = models,
-                selectedModel = { },
-            )
-
-            Button(onClick = {
-                scope.launch {
-                    ollama.generate(
-                        prompt = "Write a hello world function in Golang",
-                        model = "codellama",
-                        onFinish = { println("generatedText: $it") },
-                    ).collect {
-                        text += it
-                    }
+        Surface(color = MaterialTheme.colors.background) {
+            Box {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    ChatHistoryScreen(expanded = historyChatExpanded)
+                    ChatScreen(modifier = Modifier.weight(1f))
                 }
-            }) {
-                Text("Generate")
-            }
 
-            Text(text, color = MaterialTheme.colors.onBackground)
-
-            Button(onClick = {
-                scope.launch {
-                    models.addAll(ollama.listModels().models)
-                    println("models: $models")
+                // expand/collapse side menu button
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(4.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .clickable { historyChatExpanded = !historyChatExpanded },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        modifier = Modifier.padding(4.dp).size(24.dp),
+                        imageVector = Icons.Rounded.Menu,
+                        contentDescription = "Expand/collapse side menu",
+                        tint = Color(0xff888889),
+                    )
                 }
-            }) {
-                Text("get models")
-            }
-
-            Button(onClick = {
-                scope.launch {
-                    try {
-                        val show = ollama.show("codellama")
-                        println("show model: $show")
-                    } catch (e: OllamaModelNotFoundException) {
-                        e.printStackTrace()
-                    }
-                }
-            }) {
-                Text("show model codellama")
             }
         }
     }
 }
 
 fun main() = application {
-    val state = rememberWindowState(width = 832.dp, height = 960.dp)
+    val state = rememberWindowState()
 
     Window(onCloseRequest = ::exitApplication, state = state) {
         App()
