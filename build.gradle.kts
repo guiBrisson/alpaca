@@ -19,6 +19,7 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation(compose.materialIconsExtended)
 
     // Http client
     implementation("io.ktor:ktor-client-core:$ktor_version")
