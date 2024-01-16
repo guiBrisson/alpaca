@@ -3,6 +3,7 @@ package ui.screens.chat
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -77,9 +78,20 @@ internal fun ChatScreen(
 
             // Chat space
             LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                item {
-                    Text(text = uiState.generatedText ?: "")
+                items(uiState.messages) { message ->
+                    Row(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.Top,
+                    ) {
+                        Text(text = "${message.role.name}: ")
 
+                        val content = message.content.ifEmpty {
+                            uiState.generatedText ?: ""
+                        }
+
+                        Text(text = content)
+                    }
                 }
             }
 

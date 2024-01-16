@@ -7,14 +7,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ollama.Ollama
+import ollama.models.Message
 import ollama.models.Model
+import ollama.models.Role
 import utils.ViewModel
 
 class ChatViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
-
-    private val _generatedText = MutableStateFlow("")
 
     private val ollama = Ollama()
     val ollamaState = ollama.currentState
@@ -23,7 +23,7 @@ class ChatViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val newList = ollama.listModels().models
             _uiState.update {
-                it.copy(models = newList,)
+                it.copy(models = newList)
             }
 
             if (newList.isNotEmpty()) updateSelectedModel(newList.first())
@@ -35,11 +35,57 @@ class ChatViewModel : ViewModel() {
     }
 
     fun sendPrompt(prompt: String) {
+        addMessage(prompt, Role.USER)
+
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value.currentModel?.let { model ->
-                ollama.generate(model = model.name, prompt = prompt).collect { text ->
-                    _generatedText.value += text
-                    _uiState.update { it.copy(generatedText = _generatedText.value) }
+                var generatedText = ""
+                addMessage(text = "", role = Role.ASSISTANT)
+
+                ollama.generate(
+                    prompt = prompt,
+                    model = model.name,
+                    onFinish = { text ->
+                        val currentMessages = _uiState.value.messages.toMutableList()
+                        currentMessages.last().content = text
+                        _uiState.update { it.copy(generatedText = null, messages = currentMessages) }
+                    },
+                ).collect { text ->
+                    generatedText += text
+                    _uiState.update { it.copy(generatedText = generatedText) }
+                }
+            }
+        }
+
+//        addAssistantMessage(prompt)
+    }
+
+    private fun addMessage(text: String, role: Role) {
+        val message = Message(role = role, content = text)
+        val currentMessages = _uiState.value.messages.toMutableList()
+        currentMessages.add(message)
+
+        _uiState.update { it.copy(messages = currentMessages) }
+    }
+
+    private fun addAssistantMessage(prompt: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.value.currentModel?.let { model ->
+                var generatedText = ""
+                val assistantMessage = Message(role = Role.ASSISTANT, content = generatedText)
+                val currentMessages = _uiState.value.messages.toMutableList()
+                currentMessages.add(assistantMessage)
+
+                ollama.generate(
+                    model = model.name,
+                    prompt = prompt,
+                    onFinish = { text ->
+                        generatedText += text
+                    }
+                ).collect { text ->
+                    generatedText += text
+                    currentMessages.last().content = generatedText
+                    _uiState.update { it.copy(messages = currentMessages) }
                 }
             }
         }
