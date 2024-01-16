@@ -41,7 +41,7 @@ fun ChatScreen(
         uiState = uiState,
         ollamaState = ollamaState,
         onSelectedModel = viewModel::updateSelectedModel,
-        onSendPrompt = { println("sending prompt: $it") },
+        onSendPrompt = viewModel::sendPrompt,
     )
 }
 
@@ -77,7 +77,10 @@ internal fun ChatScreen(
 
             // Chat space
             LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                item {
+                    Text(text = uiState.generatedText ?: "")
 
+                }
             }
 
             // Text input space
