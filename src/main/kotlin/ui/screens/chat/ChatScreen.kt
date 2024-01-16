@@ -1,27 +1,35 @@
 package ui.screens.chat
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import ollama.OllamaState
 import ollama.models.Model
 import ui.components.IconButton
 import ui.components.ModelSelector
 import ui.components.TextInput
+import utils.isScrolledToEnd
 import utils.rememberViewModel
+import utils.scrollToTheBottom
 
 @Composable
 fun ChatScreen(
@@ -55,8 +63,17 @@ internal fun ChatScreen(
     onSelectedModel: (Model) -> Unit,
     onSendPrompt: (String) -> Unit,
 ) {
+    val scrollState = rememberLazyListState()
+    val endOfListReached by remember { derivedStateOf { scrollState.isScrolledToEnd() } }
+
     val expandedStartDpPadding: Dp by animateDpAsState(if (expanded) 40.dp else 0.dp)
     var prompt by remember { mutableStateOf("") }
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(uiState.messages, uiState.generatedText) {
+        if (endOfListReached) scrollToTheBottom(uiState.messages.size + 1, scrollState)
+    }
 
     Column(
         modifier = modifier.fillMaxHeight().padding(top = 4.dp).requiredWidthIn(min = 400.dp),
@@ -77,21 +94,38 @@ internal fun ChatScreen(
         ) {
 
             // Chat space
-            LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                items(uiState.messages) { message ->
-                    Row(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.Top,
-                    ) {
-                        Text(text = "${message.role.name}: ")
+            Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    state = scrollState,
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    items(uiState.messages) { message ->
+                        Row(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.Top,
+                        ) {
+                            Text(text = "${message.role.name}: ")
 
-                        val content = message.content.ifEmpty {
-                            uiState.generatedText ?: ""
+                            val content = message.content.ifEmpty {
+                                uiState.generatedText ?: ""
+                            }
+
+                            Text(text = content)
                         }
-
-                        Text(text = content)
                     }
+
+                    item {
+                        Spacer(modifier = Modifier.padding(bottom = 20.dp))
+                    }
+                }
+
+                if (!endOfListReached) {
+                    ScrollToBottomButton(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        onClick = { scope.launch { scrollToTheBottom(uiState.messages.size + 1, scrollState) } },
+                    )
                 }
             }
 
@@ -150,3 +184,24 @@ private fun ChatInputText(
         }
     }
 }
+
+@Composable
+private fun ScrollToBottomButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    IconButton(
+        modifier = modifier,
+        onClick = onClick,
+        border = BorderStroke(1.dp, color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)),
+        backgroundColor = MaterialTheme.colors.background,
+    ) {
+        Icon(
+            modifier = Modifier.padding(4.dp).size(20.dp),
+            imageVector = Icons.Rounded.ArrowDownward,
+            contentDescription = "Scroll to bottom of the chat",
+            tint = MaterialTheme.colors.onBackground,
+        )
+    }
+}
+

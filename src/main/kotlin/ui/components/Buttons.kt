@@ -1,6 +1,8 @@
 package ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -20,6 +22,7 @@ fun IconButton(
     onClick: () -> Unit,
     backgroundColor: Color = Color.Unspecified,
     shape: Shape = RoundedCornerShape(6.dp),
+    border: BorderStroke = BorderStroke(width = 0.dp, color = Color.Unspecified),
     enabled: Boolean = true,
     icon: @Composable BoxScope.() -> Unit,
 ) {
@@ -27,6 +30,7 @@ fun IconButton(
         modifier = modifier
             .padding(4.dp)
             .clip(shape)
+            .border(border, shape)
             .background(color = backgroundColor)
             .clickable(enabled = enabled) { if (enabled) onClick() },
         contentAlignment = Alignment.Center,
