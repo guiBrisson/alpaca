@@ -8,33 +8,30 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import ollama.Ollama
-import ollama.models.Model
 import ui.components.ModelSelector
+import utils.rememberViewModel
 
 @Composable
 fun ChatScreen(
     modifier: Modifier = Modifier,
     expanded: Boolean,
 ) {
-    val ollama = Ollama()
-    val list = remember { mutableListOf<Model>() }
+    val viewModel: ChatViewModel = rememberViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+    val ollamaState by viewModel.ollamaState.collectAsState()
+
     val expandedStartDpPadding: Dp by animateDpAsState(if (expanded) 40.dp else 0.dp)
-    var currentModel by remember { mutableStateOf<Model?>(null) }
 
-    // TODO: move this to a viewModel
     LaunchedEffect(Unit) {
-        list.addAll(ollama.listModels().models)
-
-        if (list.isNotEmpty()) currentModel = list.first()
+        viewModel.fetchOllamaModelList()
     }
 
     Column(modifier = modifier.fillMaxHeight().padding(top = 4.dp)) {
         ModelSelector(
             modifier = Modifier.padding(start = expandedStartDpPadding),
-            currentModel = currentModel,
-            models = list.toList(),
-            selectedModel = { currentModel = it }
+            currentModel = uiState.currentModel,
+            models = uiState.models,
+            selectedModel = viewModel::updateSelectedModel,
         )
     }
 }
