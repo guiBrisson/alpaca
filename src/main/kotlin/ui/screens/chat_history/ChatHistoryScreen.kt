@@ -1,4 +1,4 @@
-package ollama.presentation.chat_history
+package ui.screens.chat_history
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.PaddingValues

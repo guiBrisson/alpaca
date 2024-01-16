@@ -1,13 +1,9 @@
 package ui.components
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.runtime.*
@@ -26,36 +22,45 @@ import ollama.models.Model
 fun ModelSelector(
     modifier: Modifier = Modifier,
     models: List<Model>,
+    currentModel: Model? = null,
     selectedModel: (Model) -> Unit,
 ) {
-    var text by remember { mutableStateOf("Select a model") }
-    val borderColor = Color(0xffe4e4e7)
     val width = 220.dp
     val shape = RoundedCornerShape(6.dp)
     var expandedDropdown by remember { mutableStateOf(false) }
 
-    Column {
+    Column(modifier = modifier) {
         Row(
-            modifier = modifier
-                .width(width)
+            modifier = Modifier
                 .pointerHoverIcon(PointerIcon.Hand)
                 .clip(shape)
                 .clickable { expandedDropdown = !expandedDropdown }
-                .border(width = 1.dp, color = borderColor, shape = shape)
                 .padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Bottom,
         ) {
+            val name = currentModel?.name?.split(":")?.first() ?: "Select a model"
+            val tag = currentModel?.name?.split(":")?.last() ?: ""
+
             Text(
-                text = text,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = 0.sp,
+                text = name,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
             )
+
+            Text(
+                modifier = Modifier.padding(horizontal = 4.dp),
+                text = tag,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
+            )
+
             Icon(
-                modifier = Modifier.size(16.dp).padding(0.dp),
-                imageVector = Icons.Rounded.KeyboardArrowDown,
-                contentDescription = "open model selector",
+                modifier = Modifier.size(16.dp),
                 tint = Color(0xff888889),
+                imageVector = Icons.Rounded.KeyboardArrowDown,
+                contentDescription = "Expand model list menu"
             )
         }
 
@@ -66,7 +71,6 @@ fun ModelSelector(
         ) {
             val onModelClick: (Model) -> Unit = {
                 selectedModel(it)
-                text = it.name
                 expandedDropdown = false
             }
 
@@ -77,15 +81,23 @@ fun ModelSelector(
                 color = MaterialTheme.colors.onBackground,
             )
             models.forEach { model ->
-                Text(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(shape)
                         .clickable { onModelClick(model) }
                         .padding(horizontal = 6.dp, vertical = 10.dp),
-                    text = model.name,
-                    color = MaterialTheme.colors.onBackground,
-                )
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        modifier = Modifier,
+                        text = model.name,
+                        color = MaterialTheme.colors.onBackground,
+                    )
+
+                    Checkbox(size = 16.dp, checked = model == currentModel, onCheckedChange = {}, enabled = false)
+                }
             }
         }
     }

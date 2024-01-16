@@ -12,8 +12,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import ollama.presentation.chat.ChatScreen
-import ollama.presentation.chat_history.ChatHistoryScreen
+import ui.screens.chat.ChatScreen
+import ui.screens.chat_history.ChatHistoryScreen
 import ui.components.IconButton
 import ui.theme.AlpacaTheme
 
@@ -26,7 +26,7 @@ fun App() {
             Box {
                 Row(modifier = Modifier.fillMaxSize()) {
                     ChatHistoryScreen(expanded = historyChatExpanded)
-                    ChatScreen(modifier = Modifier.weight(1f))
+                    ChatScreen(modifier = Modifier.weight(1f), expanded = !historyChatExpanded)
                 }
 
                 // expand/collapse side menu button
