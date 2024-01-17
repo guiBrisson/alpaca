@@ -36,6 +36,7 @@ fun TextInput(
         singleLine = singleLine,
         maxLines = maxLines,
         minLines = minLines,
+        textStyle = MaterialTheme.typography.body1,
         decorationBox = { innerTextField ->
             Row(
                 modifier = Modifier

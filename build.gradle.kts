@@ -2,6 +2,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 val ktor_version: String by project
 val koin_version: String by project
+val richtext_version: String by project
 
 plugins {
     kotlin("jvm")
@@ -30,6 +31,10 @@ dependencies {
 
     // DI
     implementation("io.insert-koin:koin-core:$koin_version")
+
+    // Markdown
+    implementation("com.halilibo.compose-richtext:richtext-ui-material:$richtext_version")
+    implementation("com.halilibo.compose-richtext:richtext-commonmark:$richtext_version")
 }
 
 compose.desktop {
