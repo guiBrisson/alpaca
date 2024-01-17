@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 @Serializable
 data class Message(
     val role: Role,
-    val content: String,
+    var content: String,
     val images: List<String>? = null
 )
 

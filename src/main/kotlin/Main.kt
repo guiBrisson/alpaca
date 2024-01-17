@@ -12,10 +12,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import di.viewModelModule
+import org.koin.core.context.startKoin
+import ui.components.IconButton
 import ui.screens.chat.ChatScreen
 import ui.screens.chat_history.ChatHistoryScreen
-import ui.components.IconButton
 import ui.theme.AlpacaTheme
+import java.awt.Dimension
 
 @Composable
 fun App() {
@@ -50,7 +53,12 @@ fun App() {
 fun main() = application {
     val state = rememberWindowState()
 
+    startKoin {
+        modules(viewModelModule)
+    }
+
     Window(onCloseRequest = ::exitApplication, state = state) {
+        window.minimumSize = Dimension(620, 480)
         App()
     }
 }
