@@ -56,8 +56,6 @@ class ChatViewModel : ViewModel() {
                 }
             }
         }
-
-//        addAssistantMessage(prompt)
     }
 
     private fun addMessage(text: String, role: Role) {
@@ -68,27 +66,8 @@ class ChatViewModel : ViewModel() {
         _uiState.update { it.copy(messages = currentMessages) }
     }
 
-    private fun addAssistantMessage(prompt: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _uiState.value.currentModel?.let { model ->
-                var generatedText = ""
-                val assistantMessage = Message(role = Role.ASSISTANT, content = generatedText)
-                val currentMessages = _uiState.value.messages.toMutableList()
-                currentMessages.add(assistantMessage)
-
-                ollama.generate(
-                    model = model.name,
-                    prompt = prompt,
-                    onFinish = { text ->
-                        generatedText += text
-                    }
-                ).collect { text ->
-                    generatedText += text
-                    currentMessages.last().content = generatedText
-                    _uiState.update { it.copy(messages = currentMessages) }
-                }
-            }
-        }
+    fun stopOllama() {
+        ollama.close()
     }
 
     override fun onDispose() {

@@ -6,23 +6,23 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.ArrowUpward
+import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ollama.OllamaState
+import ollama.isRunning
 import ollama.models.Model
 import ui.components.IconButton
 import ui.components.ModelSelector
@@ -51,6 +51,7 @@ fun ChatScreen(
         ollamaState = ollamaState,
         onSelectedModel = viewModel::updateSelectedModel,
         onSendPrompt = viewModel::sendPrompt,
+        onStopGenerate = viewModel::stopOllama,
     )
 }
 
@@ -62,6 +63,7 @@ internal fun ChatScreen(
     ollamaState: OllamaState,
     onSelectedModel: (Model) -> Unit,
     onSendPrompt: (String) -> Unit,
+    onStopGenerate: () -> Unit,
 ) {
     val scrollState = rememberLazyListState()
     val endOfListReached by remember { derivedStateOf { scrollState.isScrolledToEnd() } }
@@ -131,9 +133,11 @@ internal fun ChatScreen(
 
             // Text input space
             ChatInputText(
+                ollamaState = ollamaState,
                 value = prompt,
                 onValueChange = { prompt = it },
                 onSend = { onSendPrompt(it); prompt = "" },
+                onStopGenerate = onStopGenerate,
             )
 
         }
@@ -143,9 +147,11 @@ internal fun ChatScreen(
 
 @Composable
 private fun ChatInputText(
-    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    ollamaState: OllamaState,
+    onStopGenerate: () -> Unit,
     onSend: (String) -> Unit,
 ) {
     TextInput(
@@ -161,7 +167,7 @@ private fun ChatInputText(
             )
         }
     ) {
-        val enabled: Boolean = value.isNotEmpty()
+        val enabled: Boolean = ollamaState.isRunning() || value.isNotEmpty()
         val backgroundColor = if (enabled) {
             MaterialTheme.colors.onBackground
         } else {
@@ -173,14 +179,23 @@ private fun ChatInputText(
             modifier = Modifier.pointerHoverIcon(icon = pointerIcon),
             enabled = enabled,
             backgroundColor = backgroundColor,
-            onClick = { onSend(value) },
+            onClick = { if (ollamaState.isRunning()) onStopGenerate() else onSend(value) },
         ) {
-            Icon(
-                modifier = Modifier.padding(4.dp).size(20.dp),
-                imageVector = Icons.Rounded.ArrowUpward,
-                contentDescription = "Send input",
-                tint = MaterialTheme.colors.background,
-            )
+            if (ollamaState.isRunning()) {
+                Icon(
+                    modifier = Modifier.padding(4.dp).size(20.dp),
+                    imageVector = Icons.Rounded.Stop,
+                    contentDescription = "Stop generating prompt",
+                    tint = MaterialTheme.colors.background,
+                )
+            } else {
+                Icon(
+                    modifier = Modifier.padding(4.dp).size(20.dp),
+                    imageVector = Icons.Rounded.ArrowUpward,
+                    contentDescription = "Send input",
+                    tint = MaterialTheme.colors.background,
+                )
+            }
         }
     }
 }
