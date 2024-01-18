@@ -30,7 +30,6 @@ val interFontFamily = FontFamily(
     ),
 )
 
-//TODO: Finish typography styles
 val typography = Typography(
     defaultFontFamily = interFontFamily,
     h1 = TextStyle(
