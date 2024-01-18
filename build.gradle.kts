@@ -3,6 +3,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 val ktor_version: String by project
 val koin_version: String by project
 val richtext_version: String by project
+val exposed_version: String by project
+val h2_version: String by project
 
 plugins {
     kotlin("jvm")
@@ -35,6 +37,13 @@ dependencies {
     // Markdown
     implementation("com.halilibo.compose-richtext:richtext-ui-material:$richtext_version")
     implementation("com.halilibo.compose-richtext:richtext-commonmark:$richtext_version")
+
+    // Data persistence
+    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
+    implementation("com.h2database:h2:$h2_version")
 }
 
 compose.desktop {
