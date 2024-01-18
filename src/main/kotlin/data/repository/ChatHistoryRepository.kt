@@ -8,4 +8,5 @@ interface ChatHistoryRepository {
     suspend fun getHistoryById(id: Long): Pair<ChatHistory?, List<Message>?>
     suspend fun createNewChat(modelName: String): Long
     suspend fun addChatMessage(chatHistoryId: Long, role: String, content: String): Long
+    suspend fun addTitleToChatHistory(id: Long, title: String): Boolean
 }

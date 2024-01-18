@@ -10,6 +10,7 @@ import data.model.MessageTable.toMessage
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.update
 
 class ChatHistoryRepositoryImpl : ChatHistoryRepository {
     override suspend fun getHistoryList(): List<ChatHistory> = dbQuery {
@@ -48,5 +49,12 @@ class ChatHistoryRepositoryImpl : ChatHistoryRepository {
         }
 
         insertStatement.resultedValues?.singleOrNull()?.let(::toMessage)?.id ?: -1
+    }
+
+    override suspend fun addTitleToChatHistory(id: Long, title: String): Boolean = dbQuery {
+        ChatHistoryTable
+            .update({ ChatHistoryTable.id eq id }) {
+                it[this.title] = title
+            } > 0
     }
 }
