@@ -12,6 +12,7 @@ import ollama.models.Model
 import ui.components.ModelSelector
 import ui.screens.chat.components.ChatInputText
 import ui.screens.chat.components.ChatSpace
+import utils.ChatSingleton
 import utils.rememberViewModel
 
 @Composable
@@ -22,9 +23,14 @@ fun ChatScreen(
     val viewModel: ChatViewModel = rememberViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val ollamaState by viewModel.ollamaState.collectAsState()
+    val selectedChat by remember { ChatSingleton.selectedChat }
 
     LaunchedEffect(Unit) {
         viewModel.fetchOllamaModelList()
+    }
+
+    LaunchedEffect(selectedChat) {
+        selectedChat?.id?.let { viewModel.fetchChatHistoryMessages(it) }
     }
 
     ChatScreen(

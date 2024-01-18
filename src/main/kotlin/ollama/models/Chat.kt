@@ -10,14 +10,32 @@ data class Message(
     val role: Role,
     var content: String,
     val images: List<String>? = null
-)
+) {
+    companion object {
+        fun fromDataObject(message: data.model.Message) = Message(
+            role = Role.fromString(message.role),
+            content = message.content,
+        )
+    }
+}
 
 @Serializable
 enum class Role {
     @SerialName("user") USER,
     @SerialName("system") SYSTEM,
-    @SerialName("assistant") ASSISTANT
+    @SerialName("assistant") ASSISTANT;
+
+    companion object {
+        fun fromString(value: String): Role {
+            return when {
+                value.contains("user") -> USER
+                value.contains("assistant") -> ASSISTANT
+                else -> SYSTEM
+            }
+        }
+    }
 }
+
 
 @Serializable
 data class ChatRequest(

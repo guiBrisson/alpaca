@@ -104,7 +104,7 @@ class Ollama(
      * @throws OllamaRunningException When Ollama is already running
      * @throws OllamaModelNotFoundException When model is not found
      */
-    suspend fun chat(messages: List<Message>, model: String, onFinish: (List<Message>) -> Unit = {}): Flow<String> {
+    suspend fun chat(messages: List<Message>, model: String, onFinish: (Message) -> Unit = {}): Flow<String> {
         if (_currentState.value.isRunning()) throw OllamaRunningException()
 
         _currentState.update { OllamaState.RUNNING }
@@ -130,9 +130,8 @@ class Ollama(
                     }
                     delay(50)
                 }
-                val updatedMessages = messages.toMutableList()
-                updatedMessages.add(Message(role = Role.ASSISTANT, content = generatedText))
-                onFinish(updatedMessages)
+                val lastMessage = Message(role = Role.ASSISTANT, content = generatedText)
+                onFinish(lastMessage)
                 _currentState.update { OllamaState.IDLE }
             }
         }

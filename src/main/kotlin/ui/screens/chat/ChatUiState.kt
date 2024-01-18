@@ -7,5 +7,7 @@ data class ChatUiState(
     val models: List<Model> = emptyList(),
     val currentModel: Model? = null,
     val generatedText: String? = null,
+
+    val loadingMessages: Boolean = false,
     val messages: List<Message> = emptyList(),
 )

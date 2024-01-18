@@ -5,6 +5,6 @@ import ui.screens.chat.ChatViewModel
 import ui.screens.chat_history.ChatHistoryViewModel
 
 val viewModelModule = module {
-    single { ChatViewModel() }
+    single { ChatViewModel(get()) }
     single { ChatHistoryViewModel(get()) }
 }
