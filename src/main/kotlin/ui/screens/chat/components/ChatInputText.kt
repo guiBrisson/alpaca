@@ -38,7 +38,9 @@ fun ChatInputText(
         hint = {
             Text(
                 text = "Message to model...",
-                color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                style = MaterialTheme.typography.body1.copy(
+                    color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                ),
             )
         }
     ) {

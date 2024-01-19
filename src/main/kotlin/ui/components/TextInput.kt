@@ -25,7 +25,7 @@ fun TextInput(
     minLines: Int = 1,
     innerPaddingValues: PaddingValues = PaddingValues(12.dp),
     hint: @Composable () -> Unit,
-    trailingButton: @Composable() (() -> Unit)? = null,
+    trailingButton: @Composable (() -> Unit)? = null,
 ) {
     BasicTextField(
         value = value,

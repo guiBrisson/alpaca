@@ -1,9 +1,11 @@
 package ui.screens.chat.components
 
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -49,11 +51,15 @@ fun ChatSpace(
     }
 
     Box(modifier = modifier.fillMaxWidth()) {
+        VerticalScrollbar(
+            modifier = Modifier.align(Alignment.CenterEnd).offset(x = 10.dp),
+            adapter = rememberScrollbarAdapter(scrollState),
+        )
         SelectionContainer {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 state = scrollState,
-                verticalArrangement = Arrangement.Bottom
+                verticalArrangement = Arrangement.Bottom,
             ) {
 
                 items(uiState.messages) { message ->
@@ -82,8 +88,8 @@ fun ChatSpace(
                     Spacer(modifier = Modifier.padding(bottom = 20.dp))
                 }
             }
-
         }
+
         if (!endOfListReached) {
             ScrollToBottomButton(
                 modifier = Modifier.align(Alignment.BottomCenter),
